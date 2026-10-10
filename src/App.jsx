@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import TopBar from './components/TopBar/TopBar';
 import Sidebar from './components/Sidebar/Sidebar';
 import { BentoCard } from './components/BentoGrid/BentoGrid';
@@ -12,13 +12,101 @@ import HabitsContent from './components/Blocks/HabitsContent';
 import LinksContent from './components/Blocks/LinksContent';
 import ShelvesContent from './components/Blocks/ShelvesContent';
 import {
+  formatDateKey, saveDayEntry, loadDayEntry,
+  saveTheme, loadTheme, exportPlannerData, importPlannerData
+} from './services/storage';
+import {
   CheckCircle2, Flame, BookOpen, Film,
   CalendarDays, Link2, TrendingUp, Sparkles,
-  BookMarked, ArrowUpRight, GripVertical
+  BookMarked, ArrowUpRight, GripVertical,
+  ChevronLeft, ChevronRight, Check
 } from 'lucide-react';
 import './components/Layout/Layout.css';
 import './components/FloatingPanel/FloatingPanel.css';
 import './App.css';
+
+/* -------------------------------------------------- */
+/* DEFAULT DEMO CONTENT (carregado se dia estiver vazio)*/
+/* -------------------------------------------------- */
+const DEFAULT_DEMO_BLOCKS = [
+  {
+    id: 'demo-heading-1',
+    type: 'heading',
+    colSpan: 3,
+    text: 'Reflexões e Metas de Hoje',
+  },
+  {
+    id: 'demo-check-1',
+    type: 'checklist',
+    colSpan: 2,
+    title: 'Lista de Prioridades',
+    items: [
+      { id: 101, text: 'Definir metas da semana', done: true },
+      { id: 102, text: 'Caminhada ao ar livre', done: false },
+      { id: 103, text: 'Revisar anotações do diário', done: false },
+    ],
+  },
+  {
+    id: 'demo-note-1',
+    type: 'note',
+    colSpan: 1,
+    text: 'Pequenos passos diários constroem grandes transformações.',
+  },
+];
+
+const DEFAULT_DEMO_STICKERS = [
+  {
+    id: 'stk-1',
+    stickerType: 'prompt',
+    x: 390,
+    y: 90,
+    width: 320,
+    prompt: 'HOJE VOU DEDICAR 30 MIN A:',
+    text: 'meu planejamento financeiro',
+    bg: '#E7F0F8',
+    textColor: '#2C4960',
+    rotation: -1.5,
+    zIndex: 20,
+  },
+  {
+    id: 'stk-2',
+    stickerType: 'badge',
+    x: 30,
+    y: 195,
+    width: 175,
+    text: 'I GOT THIS. 💪',
+    bg: '#334E68',
+    textColor: '#FFFFFF',
+    rotation: 2,
+    zIndex: 21,
+  },
+  {
+    id: 'stk-3',
+    stickerType: 'quote',
+    x: 400,
+    y: 250,
+    width: 300,
+    author: '@lembrete',
+    text: 'Você está no caminho certo. Respire fundo e continue.',
+    bg: '#FFF8E7',
+    textColor: '#574116',
+    rotation: 1,
+    zIndex: 22,
+  },
+  {
+    id: 'stk-4',
+    stickerType: 'player',
+    x: 30,
+    y: 275,
+    width: 240,
+    title: 'Good Vibrations',
+    artist: 'Beach Boys',
+    bg: '#D9E2EC',
+    textColor: '#102A43',
+    rotation: -0.5,
+    zIndex: 23,
+  },
+];
 
 /* -------------------------------------------------- */
 /* DYNAMIC CARD (Fase 2 + Draggable + M3 Menu)         */
@@ -74,7 +162,7 @@ function DynamicCard({
 /* APP ROOT                                            */
 /* -------------------------------------------------- */
 export default function App() {
-  const [theme, setTheme]       = useState('light');
+  const [theme, setTheme]       = useState(() => loadTheme());
   const [activeNav, setActiveNav] = useState('home');
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -90,87 +178,60 @@ export default function App() {
   const togglePanel = (name) =>
     setPanels(p => ({ ...p, [name]: !p[name] }));
 
-  // Free-floating stickers state (totalmente livres, arrastáveis, redimensionáveis, deletáveis)
-  const [stickers, setStickers] = useState([
-    {
-      id: 'stk-1',
-      stickerType: 'prompt',
-      x: 390,
-      y: 90,
-      width: 320,
-      prompt: 'HOJE VOU DEDICAR 30 MIN A:',
-      text: 'meu planejamento financeiro',
-      bg: '#E7F0F8',
-      textColor: '#2C4960',
-      rotation: -1.5,
-      zIndex: 20,
-    },
-    {
-      id: 'stk-2',
-      stickerType: 'badge',
-      x: 30,
-      y: 195,
-      width: 175,
-      text: 'I GOT THIS. 💪',
-      bg: '#334E68',
-      textColor: '#FFFFFF',
-      rotation: 2,
-      zIndex: 21,
-    },
-    {
-      id: 'stk-3',
-      stickerType: 'quote',
-      x: 400,
-      y: 250,
-      width: 300,
-      author: '@lembrete',
-      text: 'Você está no caminho certo. Respire fundo e continue.',
-      bg: '#FFF8E7',
-      textColor: '#574116',
-      rotation: 1,
-      zIndex: 22,
-    },
-    {
-      id: 'stk-4',
-      stickerType: 'player',
-      x: 30,
-      y: 275,
-      width: 240,
-      title: 'Good Vibrations',
-      artist: 'Beach Boys',
-      bg: '#D9E2EC',
-      textColor: '#102A43',
-      rotation: -0.5,
-      zIndex: 23,
-    },
-  ]);
+  // Date Navigation State
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const dateKey = formatDateKey(currentDate);
+  const isToday = dateKey === formatDateKey(new Date());
 
-  // Initial structured diary content blocks
-  const [blocks, setBlocks] = useState([
-    {
-      id: 'demo-heading-1',
-      type: 'heading',
-      colSpan: 3,
-      text: 'Reflexões e Metas de Hoje',
-    },
-    {
-      id: 'demo-check-1',
-      type: 'checklist',
-      colSpan: 2,
-      title: 'Lista de Prioridades',
-      items: [
-        { id: 101, text: 'Definir metas da semana', done: true },
-        { id: 102, text: 'Caminhada ao ar livre', done: false },
-        { id: 103, text: 'Revisar anotações do diário', done: false },
-      ],
-    },
-    {
-      id: 'demo-note-1',
-      type: 'note',
-      colSpan: 1,
-      text: 'Pequenos passos diários constroem grandes transformações.',
-    },
-  ]);
+  const goToPrevDay = () => setCurrentDate(prev => new Date(prev.getTime() - 86400000));
+  const goToNextDay = () => setCurrentDate(prev => new Date(prev.getTime() + 86400000));
+  const goToToday   = () => setCurrentDate(new Date());
+
+  // Data State for Current Day
+  const [blocks, setBlocks] = useState(() => {
+    const saved = loadDayEntry(formatDateKey(new Date()));
+    return saved ? saved.blocks : DEFAULT_DEMO_BLOCKS;
+  });
+
+  const [stickers, setStickers] = useState(() => {
+    const saved = loadDayEntry(formatDateKey(new Date()));
+    return saved ? saved.stickers : DEFAULT_DEMO_STICKERS;
+  });
+
+  // Auto-Save Status
+  const [saveStatus, setSaveStatus] = useState('saved');
+  const isFirstLoad = useRef(true);
+
+  // Load entry when dateKey changes
+  useEffect(() => {
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false;
+      return;
+    }
+    const saved = loadDayEntry(dateKey);
+    if (saved) {
+      setBlocks(saved.blocks || []);
+      setStickers(saved.stickers || []);
+    } else {
+      if (isToday) {
+        setBlocks(DEFAULT_DEMO_BLOCKS);
+        setStickers(DEFAULT_DEMO_STICKERS);
+      } else {
+        setBlocks([]);
+        setStickers([]);
+      }
+    }
+  }, [dateKey]);
+
+  // Auto-save to LocalStorage on change
+  useEffect(() => {
+    setSaveStatus('saving');
+    const timer = setTimeout(() => {
+      saveDayEntry(dateKey, { blocks, stickers });
+      setSaveStatus('saved');
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [blocks, stickers, dateKey]);
 
   // Drag and Drop state for blocks
   const [draggedIndex, setDraggedIndex] = useState(null);
@@ -219,6 +280,7 @@ export default function App() {
   const toggleTheme = () => {
     const next = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
+    saveTheme(next);
     document.documentElement.setAttribute('data-theme', next === 'dark' ? 'dark' : '');
   };
 
@@ -301,12 +363,39 @@ export default function App() {
     });
   }, []);
 
-  // Date display
-  const now = new Date();
-  const weekday = now.toLocaleDateString('pt-BR', { weekday: 'long' });
-  const dayNum  = now.toLocaleDateString('pt-BR', { day: '2-digit' });
-  const month   = now.toLocaleDateString('pt-BR', { month: 'long' });
-  const year    = now.getFullYear();
+  // Backup handlers
+  const handleExportBackup = () => {
+    const success = exportPlannerData();
+    if (success) {
+      alert('Backup exportado com sucesso! Arquivo JSON baixado.');
+    }
+  };
+
+  const handleImportBackup = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = importPlannerData(event.target.result);
+      if (result.success) {
+        alert(`Backup restaurado com sucesso! ${result.count} dia(s) importados.`);
+        const saved = loadDayEntry(dateKey);
+        if (saved) {
+          setBlocks(saved.blocks || []);
+          setStickers(saved.stickers || []);
+        }
+      } else {
+        alert(`Erro ao restaurar backup: ${result.error}`);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  // Date formatted strings
+  const weekday = currentDate.toLocaleDateString('pt-BR', { weekday: 'long' });
+  const dayNum  = currentDate.toLocaleDateString('pt-BR', { day: '2-digit' });
+  const month   = currentDate.toLocaleDateString('pt-BR', { month: 'long' });
+  const year    = currentDate.getFullYear();
 
   return (
     <div className="layout" data-theme={theme === 'dark' ? 'dark' : ''}>
@@ -315,6 +404,8 @@ export default function App() {
         onToggleTheme={toggleTheme}
         panels={panels}
         onTogglePanel={togglePanel}
+        onExportBackup={handleExportBackup}
+        onImportBackup={handleImportBackup}
       />
 
       <div className="layout__body">
@@ -329,22 +420,67 @@ export default function App() {
                 <span className="diary-banner__title">ESPAÇO DE POSSIBILIDADES INFINITAS ✦</span>
               </div>
 
-              {/* === DIARY HEADER === */}
+              {/* === DIARY HEADER COM NAVEGAÇÃO DE DIAS E AUTO-SAVE === */}
               <div className="diary-header">
-                <div className="diary-header__eyebrow">Página do dia</div>
-                <div className="diary-header__date">
-                  {weekday.charAt(0).toUpperCase() + weekday.slice(1)},{' '}
-                  <em>{dayNum} de {month}</em>{' '}de {year}
+                <div className="diary-header__top-row">
+                  <div className="diary-header__eyebrow">
+                    Página do dia
+                    {isToday && <span className="diary-header__today-badge">Hoje</span>}
+                  </div>
+
+                  {/* Auto-save Status */}
+                  <div className="diary-header__save-status">
+                    <span className="diary-save-dot" />
+                    <span>{saveStatus === 'saving' ? 'Salvando...' : 'Salvo no navegador'}</span>
+                  </div>
                 </div>
+
+                {/* Date Navigator */}
+                <div className="diary-date-nav">
+                  <button
+                    className="diary-date-nav__btn"
+                    onClick={goToPrevDay}
+                    title="Dia anterior"
+                    id="btn-prev-day"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+
+                  <div className="diary-header__date">
+                    {weekday.charAt(0).toUpperCase() + weekday.slice(1)},{' '}
+                    <em>{dayNum} de {month}</em>{' '}de {year}
+                  </div>
+
+                  <button
+                    className="diary-date-nav__btn"
+                    onClick={goToNextDay}
+                    title="Próximo dia"
+                    id="btn-next-day"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+
+                  {!isToday && (
+                    <button
+                      className="diary-date-nav__today-btn"
+                      onClick={goToToday}
+                      title="Voltar para a página de hoje"
+                      id="btn-go-today"
+                    >
+                      Ir para Hoje
+                    </button>
+                  )}
+                </div>
+
                 <div className="diary-header__meta">
                   <span className="diary-header__mood-tag">😊 Ótimo</span>
                   <span className="diary-header__dot" />
                   <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-4)' }}>
-                    {stickers.length} adesivo{stickers.length !== 1 ? 's' : ''} livres
+                    {blocks.length} bloco{blocks.length !== 1 ? 's' : ''} · {stickers.length} adesivo{stickers.length !== 1 ? 's' : ''}
                   </span>
                   <span className="diary-header__dot" />
                   <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-primary)', fontWeight: 500 }}>
-                    Arraste adesivos livremente pela página ✨
+                    Entradas salvas automaticamente no LocalStorage 💾
                   </span>
                 </div>
               </div>
@@ -365,7 +501,7 @@ export default function App() {
                 <div className="diary-empty">
                   <div className="diary-empty__icon">✦</div>
                   <div className="diary-empty__text">Esta página está em branco.</div>
-                  <div className="diary-empty__sub">Clique no botão + abaixo para adicionar anotações ou adesivos.</div>
+                  <div className="diary-empty__sub">Clique no botão + abaixo para começar a planejar seu dia.</div>
                 </div>
               ) : (
                 <div className="diary-bento">

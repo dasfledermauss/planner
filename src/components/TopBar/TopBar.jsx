@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import {
   BookMarked, Plus, Bell, Search, Sun, Moon,
-  Flame, CalendarDays, Link2, BookOpen
+  Flame, CalendarDays, Link2, BookOpen,
+  Download, Upload
 } from 'lucide-react';
 import './TopBar.css';
 
@@ -14,7 +15,14 @@ const MOODS = [
   { emoji: '🔥', label: 'Produtivo' },
 ];
 
-export default function TopBar({ theme, onToggleTheme, panels = {}, onTogglePanel }) {
+export default function TopBar({
+  theme,
+  onToggleTheme,
+  panels = {},
+  onTogglePanel,
+  onExportBackup,
+  onImportBackup,
+}) {
   const [mood, setMood] = useState(MOODS[0]);
   const [moodIndex, setMoodIndex] = useState(0);
 
@@ -93,6 +101,30 @@ export default function TopBar({ theme, onToggleTheme, panels = {}, onTogglePane
       {/* RIGHT */}
       <div className="topbar__right">
         <span className="topbar__date">{today}</span>
+
+        <button
+          className="topbar__icon-btn"
+          id="topbar-export"
+          onClick={onExportBackup}
+          title="Fazer Backup / Exportar Diário (JSON)"
+        >
+          <Download size={15} />
+        </button>
+
+        <label
+          className="topbar__icon-btn"
+          id="topbar-import"
+          title="Restaurar Backup (JSON)"
+          style={{ cursor: 'pointer' }}
+        >
+          <Upload size={15} />
+          <input
+            type="file"
+            accept=".json"
+            style={{ display: 'none' }}
+            onChange={onImportBackup}
+          />
+        </label>
 
         <button className="topbar__icon-btn" id="topbar-search" title="Buscar">
           <Search size={16} />
