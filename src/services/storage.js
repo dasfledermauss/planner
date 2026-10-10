@@ -81,6 +81,120 @@ export const loadTheme = () => {
   }
 };
 
+const PALETTE_KEY = 'planner_palette';
+export const savePalette = (palette) => {
+  try {
+    localStorage.setItem(PALETTE_KEY, palette);
+  } catch (err) {
+    console.error('Error saving palette:', err);
+  }
+};
+
+export const loadPalette = () => {
+  try {
+    return localStorage.getItem(PALETTE_KEY) || 'warm';
+  } catch (err) {
+    return 'warm';
+  }
+};
+
+// Global Search across all planner entries
+export const searchPlannerEntries = (query) => {
+  if (!query || !query.trim()) return [];
+  const q = query.toLowerCase().trim();
+  const dates = getSavedDatesIndex();
+  const results = [];
+
+  dates.forEach(dateKey => {
+    const entry = loadDayEntry(dateKey);
+    if (!entry) return;
+
+    const matches = [];
+
+    // Parse date for search match (e.g. 'outubro', '2026', 'quarta')
+    const [y, m, d] = dateKey.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    const dateLabel = dateObj.toLocaleDateString('pt-BR', {
+      weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+    });
+
+    if (dateLabel.toLowerCase().includes(q) || dateKey.includes(q)) {
+      matches.push({
+        type: 'date',
+        label: 'Data',
+        snippet: dateLabel,
+      });
+    }
+
+    // Search blocks
+    (entry.blocks || []).forEach(b => {
+      if (b.text && b.text.toLowerCase().includes(q)) {
+        matches.push({
+          type: b.type || 'bloco',
+          label: b.type === 'heading' ? 'Título' : b.type === 'note' ? 'Nota' : 'Texto',
+          snippet: b.text,
+        });
+      }
+      if (b.title && b.title.toLowerCase().includes(q)) {
+        matches.push({
+          type: 'checklist',
+          label: 'Checklist',
+          snippet: b.title,
+        });
+      }
+      if (b.items && Array.isArray(b.items)) {
+        b.items.forEach(it => {
+          if (it.text && it.text.toLowerCase().includes(q)) {
+            matches.push({
+              type: 'task',
+              label: 'Item de Tarefa',
+              snippet: `${it.done ? '✓' : '○'} ${it.text}`,
+            });
+          }
+        });
+      }
+      if (b.mood && b.mood.toLowerCase().includes(q)) {
+        matches.push({
+          type: 'mood',
+          label: 'Humor',
+          snippet: `${b.mood} ${b.note ? '— ' + b.note : ''}`,
+        });
+      }
+      if (b.note && b.note.toLowerCase().includes(q)) {
+        matches.push({
+          type: 'mood-note',
+          label: 'Reflexão',
+          snippet: b.note,
+        });
+      }
+    });
+
+    // Search stickers
+    (entry.stickers || []).forEach(s => {
+      const texts = [s.text, s.prompt, s.author, s.title, s.artist].filter(Boolean);
+      texts.forEach(txt => {
+        if (txt.toLowerCase().includes(q)) {
+          matches.push({
+            type: 'sticker',
+            label: 'Adesivo',
+            snippet: txt,
+          });
+        }
+      });
+    });
+
+    if (matches.length > 0) {
+      results.push({
+        dateKey,
+        displayDate: dateLabel,
+        matches,
+      });
+    }
+  });
+
+  return results;
+};
+
 // Full Backup & Export as JSON
 export const exportPlannerData = () => {
   try {

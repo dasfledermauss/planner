@@ -132,6 +132,58 @@
   --shadow-4: 0 12px 28px rgba(0,0,0,0.5);
 }
 
+/* === AESTHETIC PAPER PALETTES (LIGHT) === */
+[data-palette="sage"]:not([data-theme="dark"]) {
+  --color-bg:           #EEF3EC;
+  --color-surface:      #F7FAF6;
+  --color-surface-2:    #E3ECE0;
+  --color-surface-3:    #D7E3D3;
+  --color-outline:      #B7C7B2;
+  --color-outline-soft: #CFDCCB;
+  --color-primary:      #4C6E4A;
+  --color-primary-soft: #70936E;
+  --color-primary-bg:   #DFEBDC;
+  --color-secondary:    #5E735D;
+  --color-accent:       #6B8F71;
+  --color-text-1:       #202920;
+  --color-text-2:       #455444;
+  --color-text-3:       #728470;
+}
+
+[data-palette="blush"]:not([data-theme="dark"]) {
+  --color-bg:           #F9F1F1;
+  --color-surface:      #FDF9F9;
+  --color-surface-2:    #F2E5E5;
+  --color-surface-3:    #E8D7D7;
+  --color-outline:      #CDBABA;
+  --color-outline-soft: #E2D3D3;
+  --color-primary:      #915763;
+  --color-primary-soft: #B57783;
+  --color-primary-bg:   #F6DFE4;
+  --color-secondary:    #856569;
+  --color-accent:       #CC7C8B;
+  --color-text-1:       #2F2124;
+  --color-text-2:       #574346;
+  --color-text-3:       #8D7478;
+}
+
+[data-palette="indigo"]:not([data-theme="dark"]) {
+  --color-bg:           #ECF1F7;
+  --color-surface:      #F5F8FC;
+  --color-surface-2:    #DFE8F2;
+  --color-surface-3:    #D0DFEB;
+  --color-outline:      #B3C3D6;
+  --color-outline-soft: #CDD9E7;
+  --color-primary:      #3C5D85;
+  --color-primary-soft: #5F82AB;
+  --color-primary-bg:   #DCE8F7;
+  --color-secondary:    #556C87;
+  --color-accent:       #5179A4;
+  --color-text-1:       #192432;
+  --color-text-2:       #3C4F64;
+  --color-text-3:       #6A8099;
+}
+
 /* ============================================
    RESET & BASE
    ============================================ */

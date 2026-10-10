@@ -19,8 +19,12 @@ const SECONDARY_ITEMS = [
   { id: 'stickers', icon: Sticker,       label: 'Stickers',     badge: null },
 ];
 
-export default function Sidebar({ activeItem, onNavigate }) {
+export default function Sidebar({ activeItem, onNavigate, savedCount = 0 }) {
   const [expanded, setExpanded] = useState(false);
+
+  const navItems = NAV_ITEMS.map(item =>
+    item.id === 'pages' ? { ...item, badge: savedCount || null } : item
+  );
 
   return (
     <nav
@@ -29,7 +33,7 @@ export default function Sidebar({ activeItem, onNavigate }) {
       aria-label="Menu lateral"
     >
       <div className="sidebar__nav">
-        {NAV_ITEMS.map(item => (
+        {navItems.map(item => (
           <SidebarItem
             key={item.id}
             item={item}

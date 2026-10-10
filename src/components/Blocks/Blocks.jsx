@@ -345,10 +345,14 @@ export function CodeBlock({ data, onChange }) {
 /* -------------------------------------------------- */
 /* MINI CALENDAR BLOCK                                 */
 /* -------------------------------------------------- */
-export function MiniCalBlock() {
+export function MiniCalBlock({ currentDate, onSelectDate, savedDates }) {
   return (
     <div className="block-minical">
-      <MiniCalendarContent />
+      <MiniCalendarContent
+        currentDate={currentDate}
+        onSelectDate={onSelectDate}
+        savedDates={savedDates}
+      />
     </div>
   );
 }
@@ -460,7 +464,13 @@ export function StickerBlock({ data, onChange }) {
 /* -------------------------------------------------- */
 /* BLOCK RENDERER (dispatch by type)                   */
 /* -------------------------------------------------- */
-export function BlockRenderer({ block, onChange }) {
+export function BlockRenderer({
+  block,
+  onChange,
+  currentDate,
+  onSelectDate,
+  savedDates,
+}) {
   const props = { data: block, onChange };
   switch (block.type) {
     case 'heading':   return <HeadingBlock   {...props} />;
@@ -470,7 +480,7 @@ export function BlockRenderer({ block, onChange }) {
     case 'image':     return <ImageBlock     {...props} />;
     case 'checklist': return <ChecklistBlock {...props} />;
     case 'code':      return <CodeBlock      {...props} />;
-    case 'minical':   return <MiniCalBlock   {...props} />;
+    case 'minical':   return <MiniCalBlock currentDate={currentDate} onSelectDate={onSelectDate} savedDates={savedDates} {...props} />;
     case 'habits':    return <HabitsContent />;
     case 'mood':      return <MoodContent    {...props} />;
     case 'links':     return <LinksContent />;

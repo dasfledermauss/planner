@@ -895,6 +895,32 @@
   border-color: var(--color-primary);
 }
 
+.shelf-remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline-soft);
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--dur-fast);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.shelf-card {
+  position: relative;
+}
+.shelf-card:hover .shelf-remove-btn {
+  opacity: 1;
+}
+
 /* ============================================
    HABITS WIDGET
    ============================================ */

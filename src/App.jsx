@@ -11,9 +11,12 @@ import MiniCalendarContent from './components/Blocks/MiniCalendarContent';
 import HabitsContent from './components/Blocks/HabitsContent';
 import LinksContent from './components/Blocks/LinksContent';
 import ShelvesContent from './components/Blocks/ShelvesContent';
+import SearchModal from './components/SearchModal/SearchModal';
+import AddItemModal from './components/AddItemModal/AddItemModal';
 import {
   formatDateKey, saveDayEntry, loadDayEntry,
-  saveTheme, loadTheme, exportPlannerData, importPlannerData
+  saveTheme, loadTheme, exportPlannerData, importPlannerData,
+  savePalette, loadPalette, getSavedDatesIndex
 } from './services/storage';
 import {
   CheckCircle2, Flame, BookOpen, Film,
@@ -123,7 +126,10 @@ function DynamicCard({
   onDragEnd,
   onUpdate,
   onDelete,
-  onResize
+  onResize,
+  currentDate,
+  onSelectDate,
+  savedDates,
 }) {
   return (
     <BentoCard
@@ -153,6 +159,9 @@ function DynamicCard({
       <BlockRenderer
         block={block}
         onChange={updated => onUpdate(block.id, updated)}
+        currentDate={currentDate}
+        onSelectDate={onSelectDate}
+        savedDates={savedDates}
       />
     </BentoCard>
   );
@@ -162,9 +171,69 @@ function DynamicCard({
 /* APP ROOT                                            */
 /* -------------------------------------------------- */
 export default function App() {
-  const [theme, setTheme]       = useState(() => loadTheme());
+  const [theme, setTheme]         = useState(() => loadTheme());
+  const [palette, setPalette]     = useState(() => loadPalette());
   const [activeNav, setActiveNav] = useState('home');
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [savedDates, setSavedDates] = useState(() => getSavedDatesIndex());
+
+  // Global shelves state (shared between panel and inline AddItemModal)
+  const INITIAL_BOOKS = [
+    { id: 1, title: 'O Hobbit', author: 'J.R.R. Tolkien', progress: 64, status: 'cap. 14 de 19', cover: null },
+    { id: 2, title: 'Hábitos Atômicos', author: 'James Clear', progress: 30, status: 'cap. 4 de 15', cover: null },
+  ];
+  const INITIAL_MOVIES = [
+    { id: 101, title: 'Duna: Parte 2', director: 'Denis Villeneuve', rating: 5, cover: null },
+    { id: 102, title: 'Interstellar', director: 'Christopher Nolan', rating: 5, cover: null },
+  ];
+  const [books, setBooks] = useState(INITIAL_BOOKS);
+  const [movies, setMovies] = useState(INITIAL_MOVIES);
+  const [addItemOpen, setAddItemOpen] = useState(false);
+  const [addItemType, setAddItemType] = useState('book'); // 'book' | 'film'
+  const [shelvesDefaultTab, setShelvesDefaultTab] = useState('books');
+
+  const openAddItem = (type) => {
+    setAddItemType(type);
+    setAddItemOpen(true);
+  };
+
+  const handleAddItemConfirm = (type, item) => {
+    if (type === 'book') setBooks(prev => [...prev, item]);
+    else setMovies(prev => [...prev, item]);
+  };
+
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : '');
+    document.documentElement.setAttribute('data-palette', palette);
+  }, [theme, palette]);
+
+  const handleChangePalette = (newPalette) => {
+    setPalette(newPalette);
+    savePalette(newPalette);
+  };
+
+  // Global Keyboard Shortcuts (Ctrl+K or / to search)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchOpen(prev => !prev);
+        return;
+      }
+      if (
+        e.key === '/' &&
+        !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) &&
+        !document.activeElement?.isContentEditable
+      ) {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   // Floating panels state
   const [panels, setPanels] = useState({
@@ -186,6 +255,15 @@ export default function App() {
   const goToPrevDay = () => setCurrentDate(prev => new Date(prev.getTime() - 86400000));
   const goToNextDay = () => setCurrentDate(prev => new Date(prev.getTime() + 86400000));
   const goToToday   = () => setCurrentDate(new Date());
+
+  const handleSelectDate = useCallback((target) => {
+    if (typeof target === 'string') {
+      const [y, m, d] = target.split('-').map(Number);
+      setCurrentDate(new Date(y, m - 1, d));
+    } else if (target instanceof Date) {
+      setCurrentDate(target);
+    }
+  }, []);
 
   // Data State for Current Day
   const [blocks, setBlocks] = useState(() => {
@@ -228,6 +306,7 @@ export default function App() {
     setSaveStatus('saving');
     const timer = setTimeout(() => {
       saveDayEntry(dateKey, { blocks, stickers });
+      setSavedDates(getSavedDatesIndex());
       setSaveStatus('saved');
     }, 300);
     return () => clearTimeout(timer);
@@ -379,6 +458,7 @@ export default function App() {
       const result = importPlannerData(event.target.result);
       if (result.success) {
         alert(`Backup restaurado com sucesso! ${result.count} dia(s) importados.`);
+        setSavedDates(getSavedDatesIndex());
         const saved = loadDayEntry(dateKey);
         if (saved) {
           setBlocks(saved.blocks || []);
@@ -391,6 +471,28 @@ export default function App() {
     reader.readAsText(file);
   };
 
+  // Sidebar navigation action handler
+  const handleSidebarNavigate = (id) => {
+    setActiveNav(id);
+    if (id === 'home') {
+      goToToday();
+    } else if (id === 'calendar') {
+      togglePanel('calendar');
+    } else if (id === 'pages') {
+      setSearchOpen(true);
+    } else if (id === 'bento') {
+      const el = document.querySelector('.diary-bento');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      else setPickerOpen(true);
+    } else if (id === 'habits') {
+      togglePanel('habits');
+    } else if (id === 'books' || id === 'films') {
+      setPanels(p => ({ ...p, shelves: true }));
+    } else if (id === 'stickers') {
+      setPanels(p => ({ ...p, stickers: true }));
+    }
+  };
+
   // Date formatted strings
   const weekday = currentDate.toLocaleDateString('pt-BR', { weekday: 'long' });
   const dayNum  = currentDate.toLocaleDateString('pt-BR', { day: '2-digit' });
@@ -398,10 +500,17 @@ export default function App() {
   const year    = currentDate.getFullYear();
 
   return (
-    <div className="layout" data-theme={theme === 'dark' ? 'dark' : ''}>
+    <div
+      className="layout"
+      data-theme={theme === 'dark' ? 'dark' : ''}
+      data-palette={palette}
+    >
       <TopBar
         theme={theme}
         onToggleTheme={toggleTheme}
+        palette={palette}
+        onChangePalette={handleChangePalette}
+        onOpenSearch={() => setSearchOpen(true)}
         panels={panels}
         onTogglePanel={togglePanel}
         onExportBackup={handleExportBackup}
@@ -409,7 +518,11 @@ export default function App() {
       />
 
       <div className="layout__body">
-        <Sidebar activeItem={activeNav} onNavigate={setActiveNav} />
+        <Sidebar
+          activeItem={activeNav}
+          onNavigate={handleSidebarNavigate}
+          savedCount={savedDates.length}
+        />
 
         <main className="layout__main" id="main-content">
           <div className="diary-wrap">
@@ -522,6 +635,9 @@ export default function App() {
                       onUpdate={handleUpdateBlock}
                       onDelete={handleDeleteBlock}
                       onResize={handleResizeBlock}
+                      currentDate={currentDate}
+                      onSelectDate={handleSelectDate}
+                      savedDates={savedDates}
                     />
                   ))}
                 </div>
@@ -562,7 +678,11 @@ export default function App() {
           onClose={() => togglePanel('calendar')}
           initialPos={{ top: 80, right: 360 }}
         >
-          <MiniCalendarContent />
+          <MiniCalendarContent
+            currentDate={currentDate}
+            onSelectDate={handleSelectDate}
+            savedDates={savedDates}
+          />
         </FloatingPanel>
       )}
 
@@ -598,6 +718,15 @@ export default function App() {
           <StickersPanel onAddSticker={handleAddSticker} />
         </FloatingPanel>
       )}
+
+      {/* ====== SEARCH / COMMAND PALETTE MODAL ====== */}
+      <SearchModal
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onSelectDate={handleSelectDate}
+        savedDates={savedDates}
+        currentDateKey={dateKey}
+      />
 
       {/* ====== FAB + MODULE PICKER ====== */}
       <ModulePicker

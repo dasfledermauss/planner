@@ -44,10 +44,32 @@ const INITIAL_MOVIES = [
   },
 ];
 
-export default function ShelvesContent() {
-  const [activeTab, setActiveTab] = useState('books'); // 'books' | 'movies'
-  const [books, setBooks] = useState(INITIAL_BOOKS);
-  const [movies, setMovies] = useState(INITIAL_MOVIES);
+export default function ShelvesContent({
+  // When provided externally (from App), use those. Otherwise, manage internally.
+  books: externalBooks,
+  movies: externalMovies,
+  onBooksChange,
+  onMoviesChange,
+  defaultTab = 'books',
+  onRequestAdd,    // (type: 'book'|'film') => void — opens the Add modal
+}) {
+  const [activeTab, setActiveTab] = useState(defaultTab);
+  const [internalBooks, setInternalBooks] = useState(INITIAL_BOOKS);
+  const [internalMovies, setInternalMovies] = useState(INITIAL_MOVIES);
+
+  const books = externalBooks !== undefined ? externalBooks : internalBooks;
+  const movies = externalMovies !== undefined ? externalMovies : internalMovies;
+
+  const setBooks = (fn) => {
+    const next = typeof fn === 'function' ? fn(books) : fn;
+    if (onBooksChange) onBooksChange(next);
+    else setInternalBooks(next);
+  };
+  const setMovies = (fn) => {
+    const next = typeof fn === 'function' ? fn(movies) : fn;
+    if (onMoviesChange) onMoviesChange(next);
+    else setInternalMovies(next);
+  };
 
   // File upload for book/movie cover
   const handleCoverUpload = (id, type, file) => {
@@ -64,30 +86,32 @@ export default function ShelvesContent() {
   };
 
   const addBook = () => {
-    const title = prompt('Título do livro:');
-    if (!title) return;
-    const author = prompt('Autor: ') || 'Desconhecido';
-    setBooks(prev => [...prev, {
-      id: Date.now(),
-      title,
-      author,
-      progress: 0,
-      status: 'Iniciando',
-      cover: null,
-    }]);
+    if (onRequestAdd) {
+      onRequestAdd('book');
+    } else {
+      const title = prompt('Título do livro:');
+      if (!title) return;
+      const author = prompt('Autor: ') || 'Desconhecido';
+      setBooks(prev => [...prev, {
+        id: Date.now(), title, author, progress: 0, status: 'Para ler', cover: null,
+      }]);
+    }
   };
 
   const addMovie = () => {
-    const title = prompt('Título do filme:');
-    if (!title) return;
-    setMovies(prev => [...prev, {
-      id: Date.now(),
-      title,
-      director: 'Cinema',
-      rating: 5,
-      cover: null,
-    }]);
+    if (onRequestAdd) {
+      onRequestAdd('film');
+    } else {
+      const title = prompt('Título do filme:');
+      if (!title) return;
+      setMovies(prev => [...prev, {
+        id: Date.now(), title, director: 'Cinema', rating: 5, cover: null,
+      }]);
+    }
   };
+
+  const removeBook = (id) => setBooks(prev => prev.filter(b => b.id !== id));
+  const removeMovie = (id) => setMovies(prev => prev.filter(m => m.id !== id));
 
   return (
     <div className="shelves-widget">
@@ -141,6 +165,14 @@ export default function ShelvesContent() {
                 </div>
                 <div className="shelf-meta">{book.progress}% · {book.status}</div>
               </div>
+
+              <button
+                className="shelf-remove-btn"
+                onClick={() => removeBook(book.id)}
+                title="Remover livro"
+              >
+                <Trash2 size={11} />
+              </button>
             </div>
           ))}
 
@@ -192,6 +224,14 @@ export default function ShelvesContent() {
                   ))}
                 </div>
               </div>
+
+              <button
+                className="shelf-remove-btn"
+                onClick={() => removeMovie(movie.id)}
+                title="Remover filme"
+              >
+                <Trash2 size={11} />
+              </button>
             </div>
           ))}
 

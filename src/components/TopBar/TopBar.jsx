@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import {
-  BookMarked, Plus, Bell, Search, Sun, Moon,
-  Flame, CalendarDays, Link2, BookOpen,
-  Download, Upload
+  BookMarked, Bell, Search, Sun, Moon,
+  Link2, Download, Upload
 } from 'lucide-react';
 import './TopBar.css';
 
@@ -15,9 +14,19 @@ const MOODS = [
   { emoji: '🔥', label: 'Produtivo' },
 ];
 
+const PALETTES = [
+  { id: 'warm',   label: 'Papiro Clássico', icon: '🌾' },
+  { id: 'sage',   label: 'Sálvia Botânica', icon: '🌿' },
+  { id: 'blush',  label: 'Rosé & Aconchego', icon: '🌸' },
+  { id: 'indigo', label: 'Índigo Noturno',   icon: '🌌' },
+];
+
 export default function TopBar({
   theme,
   onToggleTheme,
+  palette = 'warm',
+  onChangePalette,
+  onOpenSearch,
   panels = {},
   onTogglePanel,
   onExportBackup,
@@ -36,11 +45,17 @@ export default function TopBar({
     setMood(MOODS[next]);
   };
 
+  const cyclePalette = () => {
+    if (!onChangePalette) return;
+    const currentIdx = PALETTES.findIndex(p => p.id === palette);
+    const nextIdx = (currentIdx + 1) % PALETTES.length;
+    onChangePalette(PALETTES[nextIdx].id);
+  };
+
+  const currentPaletteObj = PALETTES.find(p => p.id === palette) || PALETTES[0];
+
   const PANEL_BTNS = [
-    { key: 'habits',   icon: Flame,       label: 'Hábitos'    },
-    { key: 'calendar', icon: CalendarDays, label: 'Calendário' },
-    { key: 'links',    icon: Link2,        label: 'Links'      },
-    { key: 'shelves',  icon: BookOpen,     label: 'Prateleiras'},
+    { key: 'links', icon: Link2, label: 'Links Rápidos' },
   ];
 
   return (
@@ -102,6 +117,16 @@ export default function TopBar({
       <div className="topbar__right">
         <span className="topbar__date">{today}</span>
 
+        {/* Paper Palette Switcher */}
+        <button
+          className="topbar__icon-btn"
+          id="topbar-palette-btn"
+          onClick={cyclePalette}
+          title={`Paleta do Papel: ${currentPaletteObj.label} (clique para alternar)`}
+        >
+          <span style={{ fontSize: 13 }}>{currentPaletteObj.icon}</span>
+        </button>
+
         <button
           className="topbar__icon-btn"
           id="topbar-export"
@@ -126,7 +151,12 @@ export default function TopBar({
           />
         </label>
 
-        <button className="topbar__icon-btn" id="topbar-search" title="Buscar">
+        <button
+          className="topbar__icon-btn"
+          id="topbar-search"
+          onClick={onOpenSearch}
+          title="Buscar no Planner (Ctrl + K)"
+        >
           <Search size={16} />
         </button>
         <button className="topbar__icon-btn" id="topbar-notifications" title="Notificações">
@@ -136,7 +166,7 @@ export default function TopBar({
           className={`topbar__icon-btn${theme === 'dark' ? ' active' : ''}`}
           id="topbar-theme-toggle"
           onClick={onToggleTheme}
-          title="Alternar tema"
+          title="Alternar tema claro/escuro"
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
