@@ -1,0 +1,188 @@
+/* ============================================
+   FREE FLOATING STICKERS (Adesivos Livres)
+   ============================================ */
+
+.free-sticker {
+  position: absolute;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow var(--dur-fast), transform var(--dur-fast);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+}
+
+.free-sticker:hover {
+  box-shadow: var(--shadow-3);
+}
+
+.free-sticker.is-dragging {
+  cursor: grabbing;
+  box-shadow: var(--shadow-4);
+  opacity: 0.95;
+  transition: none; /* smooth instant move */
+}
+
+/* Controls overlay on hover */
+.free-sticker__controls {
+  position: absolute;
+  top: -12px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--dur-fast), transform var(--dur-fast);
+  z-index: 30;
+}
+
+.free-sticker:hover .free-sticker__controls {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.free-sticker__btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline-soft);
+  color: var(--color-text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-1);
+  cursor: pointer;
+  transition: all var(--dur-fast);
+}
+
+.free-sticker__btn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-1);
+}
+
+.free-sticker__btn--delete:hover {
+  background: #FFEBEB;
+  color: var(--color-danger);
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* Resize Handle */
+.free-sticker__resize-handle {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+  opacity: 0;
+  cursor: se-resize;
+  transition: opacity var(--dur-fast);
+  z-index: 20;
+}
+
+.free-sticker:hover .free-sticker__resize-handle {
+  opacity: 0.6;
+}
+.free-sticker__resize-handle:hover {
+  opacity: 1;
+}
+
+/* Sticker content styles */
+.free-sticker__content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Prompt Post-It */
+.free-sticker__prompt-title {
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: inherit;
+  opacity: 0.85;
+  margin-bottom: 6px;
+  user-select: text;
+}
+
+.free-sticker__prompt-input {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid currentColor;
+  outline: none;
+  width: 100%;
+  color: inherit;
+  padding-bottom: 2px;
+  user-select: text;
+}
+
+/* Badge Sticker */
+.free-sticker--badge {
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.free-sticker__badge-input {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  text-align: center;
+  width: 100%;
+  user-select: text;
+}
+
+/* Quote Sticker */
+.free-sticker__quote-author {
+  font-size: 10px;
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.05em;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  opacity: 0.8;
+  margin-bottom: 4px;
+  width: 100%;
+  user-select: text;
+}
+
+.free-sticker__quote-text {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  font-style: italic;
+  line-height: var(--leading-snug);
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  width: 100%;
+  resize: none;
+  user-select: text;
+}
+
+/* Music Player Sticker */
+.free-sticker__player {
+  gap: var(--space-2);
+}

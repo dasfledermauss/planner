@@ -1,0 +1,1048 @@
+/* ============================================
+   BLOCK MODULES — Material Design 3 Planner Styles
+   ============================================ */
+
+/* ---- Shared editable surface ---- */
+.block-editable {
+  outline: none;
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  color: var(--color-text-1);
+  resize: none;
+  caret-color: var(--color-primary);
+}
+.block-editable::placeholder {
+  color: var(--color-text-4);
+}
+.block-editable:focus {
+  outline: none;
+}
+
+/* ============================================
+   CARD CONTROLS (3-Dots Menu & Drag Handle)
+   ============================================ */
+.block-card-header {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.block-drag-handle {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline-soft);
+  box-shadow: var(--shadow-1);
+  cursor: grab;
+  opacity: 0;
+  pointer-events: all;
+  transition: opacity var(--dur-fast), color var(--dur-fast), background var(--dur-fast);
+}
+.block-drag-handle:active {
+  cursor: grabbing;
+}
+.block-drag-handle:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.bento-card:hover .block-drag-handle,
+.bento-card:focus-within .block-drag-handle {
+  opacity: 0.85;
+}
+
+.block-controls {
+  position: relative;
+  pointer-events: all;
+  margin-left: auto;
+}
+
+.block-menu-trigger {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline-soft);
+  box-shadow: var(--shadow-1);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-fast), background var(--dur-fast), color var(--dur-fast);
+}
+
+.bento-card:hover .block-menu-trigger,
+.bento-card:focus-within .block-menu-trigger,
+.block-menu-trigger.active {
+  opacity: 1;
+}
+
+.block-menu-trigger:hover,
+.block-menu-trigger.active {
+  background: var(--color-surface-2);
+  color: var(--color-text-1);
+  border-color: var(--color-outline);
+}
+
+/* Material 3 Dropdown Menu */
+.block-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 130px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-3);
+  padding: 6px;
+  z-index: 50;
+  animation: menuEnter 0.15s var(--ease-decel);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+@keyframes menuEnter {
+  from { opacity: 0; transform: scale(0.92) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.block-dropdown-menu__label {
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-4);
+  padding: 4px 6px 2px;
+}
+
+.block-dropdown-menu__cols {
+  display: flex;
+  gap: 3px;
+  padding: 2px 4px;
+}
+
+.block-dropdown-menu__col-btn {
+  flex: 1;
+  height: 24px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: var(--weight-semi);
+  color: var(--color-text-2);
+  background: var(--color-surface-2);
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.block-dropdown-menu__col-btn:hover {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.block-dropdown-menu__col-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.block-dropdown-menu__divider {
+  height: 1px;
+  background: var(--color-outline-soft);
+  margin: 4px 0;
+}
+
+.block-dropdown-menu__item {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  color: var(--color-text-2);
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+
+.block-dropdown-menu__item--danger {
+  color: var(--color-danger);
+}
+.block-dropdown-menu__item--danger:hover {
+  background: rgba(192, 57, 43, 0.08);
+  color: var(--color-danger);
+}
+
+/* ============================================
+   HEADING BLOCK
+   ============================================ */
+.block-heading {
+  padding: var(--space-2) var(--space-2);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+.block-heading__input {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-regular);
+  color: var(--color-text-1);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-snug);
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  caret-color: var(--color-primary);
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--dur-fast), box-shadow var(--dur-fast);
+}
+.block-heading__input:hover,
+.block-heading__input:focus {
+  background: var(--color-surface-2);
+}
+.block-heading__input::placeholder { color: var(--color-text-4); }
+
+/* ============================================
+   PARAGRAPH BLOCK
+   ============================================ */
+.block-paragraph {
+  padding: var(--space-2) var(--space-2);
+  min-height: 60px;
+}
+.block-paragraph__input {
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  color: var(--color-text-2);
+  line-height: var(--leading-relaxed);
+  width: 100%;
+  min-height: 60px;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  caret-color: var(--color-primary);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  transition: background var(--dur-fast);
+}
+.block-paragraph__input:hover,
+.block-paragraph__input:focus {
+  background: var(--color-surface-2);
+}
+.block-paragraph__input::placeholder { color: var(--color-text-4); }
+
+/* ============================================
+   DIVIDER BLOCK
+   ============================================ */
+.block-divider {
+  padding: var(--space-3) var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 36px;
+}
+.block-divider__line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-outline);
+}
+.block-divider__dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--color-outline);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   IMAGE BLOCK
+   ============================================ */
+.block-image {
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  position: relative;
+}
+.block-image__drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  height: 100%;
+  min-height: 140px;
+  padding: var(--space-5);
+  border: 1.5px dashed var(--color-outline);
+  border-radius: var(--radius-md);
+  transition: border-color var(--dur-fast), background var(--dur-fast);
+  cursor: pointer;
+}
+.block-image__drop-zone:hover,
+.block-image__drop-zone.drag-over {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+.block-image__drop-icon {
+  width: 38px; height: 38px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-3);
+  transition: transform var(--dur-fast);
+}
+.block-image__drop-zone:hover .block-image__drop-icon {
+  transform: scale(1.08);
+  color: var(--color-primary);
+}
+.block-image__drop-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-3);
+  font-weight: var(--weight-medium);
+  text-align: center;
+}
+.block-image__drop-sub {
+  font-size: var(--text-xs);
+  color: var(--color-text-4);
+  text-align: center;
+}
+.block-image__hidden-input { display: none; }
+
+.block-image__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  display: block;
+}
+.block-image__caption-input {
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+  text-align: center;
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  caret-color: var(--color-primary);
+  font-family: var(--font-sans);
+  border-radius: var(--radius-sm);
+  transition: background var(--dur-fast);
+}
+.block-image__caption-input:hover,
+.block-image__caption-input:focus {
+  background: var(--color-surface-2);
+}
+.block-image__caption-input::placeholder { color: var(--color-text-4); }
+
+/* ============================================
+   NOTE BLOCK
+   ============================================ */
+.block-note {
+  padding: var(--space-2) var(--space-3);
+  min-height: 60px;
+  border-left: 3px solid var(--color-accent-soft);
+}
+.block-note__input {
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--color-text-2);
+  line-height: var(--leading-relaxed);
+  width: 100%;
+  min-height: 50px;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  caret-color: var(--color-primary);
+  font-family: var(--font-sans);
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--dur-fast);
+}
+.block-note__input:hover,
+.block-note__input:focus {
+  background: var(--color-surface-2);
+}
+.block-note__input::placeholder { color: var(--color-text-4); }
+
+/* ============================================
+   CHECKLIST BLOCK
+   ============================================ */
+.block-checklist {
+  padding: var(--space-2) var(--space-2);
+  min-height: 60px;
+}
+.block-checklist__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+  gap: var(--space-2);
+}
+.block-checklist__title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--color-text-1);
+  background: transparent;
+  border: none;
+  outline: none;
+  caret-color: var(--color-primary);
+  font-family: var(--font-sans);
+  flex: 1;
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--dur-fast);
+}
+.block-checklist__title:hover,
+.block-checklist__title:focus {
+  background: var(--color-surface-2);
+}
+.block-checklist__title::placeholder { color: var(--color-text-4); }
+.block-checklist__add {
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: var(--weight-medium);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  transition: background var(--dur-fast);
+}
+.block-checklist__add:hover { background: var(--color-primary-bg); }
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--dur-fast);
+}
+.checklist-item:hover {
+  background: var(--color-surface-2);
+}
+.checklist-item__check {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid var(--color-outline);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background var(--dur-fast), border-color var(--dur-fast);
+}
+.checklist-item__check:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+.checklist-item__check.done {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+.checklist-item__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-2);
+  background: transparent;
+  border: none;
+  outline: none;
+  flex: 1;
+  caret-color: var(--color-primary);
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
+  padding: 2px 4px;
+}
+.checklist-item__text.done {
+  text-decoration: line-through;
+  color: var(--color-text-4);
+}
+.checklist-item__delete {
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-4);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-fast), background var(--dur-fast), color var(--dur-fast);
+}
+.checklist-item:hover .checklist-item__delete { opacity: 1; }
+.checklist-item__delete:hover {
+  background: rgba(192,57,43,0.08);
+  color: var(--color-danger);
+}
+
+/* ============================================
+   CODE/HTML BLOCK
+   ============================================ */
+.block-code {
+  padding: var(--space-2) var(--space-2);
+  min-height: 80px;
+}
+.block-code__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  color: var(--color-text-3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.block-code__dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+.block-code__textarea {
+  width: 100%;
+  min-height: 70px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: var(--text-xs);
+  color: var(--color-text-1);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-outline-soft);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  outline: none;
+  resize: none;
+  line-height: 1.6;
+  caret-color: var(--color-primary);
+  transition: border-color var(--dur-fast);
+}
+.block-code__textarea:hover,
+.block-code__textarea:focus {
+  border-color: var(--color-primary-soft);
+}
+.block-code__preview {
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+  min-height: 30px;
+}
+
+/* ============================================
+   MINI CALENDAR BLOCK
+   ============================================ */
+.block-minical {
+  padding: var(--space-2) var(--space-2);
+}
+
+/* ============================================
+   STICKER BLOCKS (Inspired by Planner Reference)
+   ============================================ */
+.block-sticker {
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-1);
+  transition: box-shadow var(--dur-fast);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.block-sticker:hover {
+  box-shadow: var(--shadow-2);
+}
+
+/* Prompt sticker (post-it) */
+.block-sticker--prompt .sticker-prompt__title-input {
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: inherit;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
+.block-sticker--prompt .sticker-prompt__text-input {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid currentColor;
+  outline: none;
+  width: 100%;
+  color: inherit;
+  padding-bottom: 2px;
+}
+
+/* Badge sticker */
+.block-sticker--badge {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+}
+
+.sticker-badge__input {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  text-align: center;
+  width: 100%;
+}
+
+/* Quote sticker */
+.block-sticker--quote .sticker-quote__author-input {
+  font-size: 10px;
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.05em;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  opacity: 0.8;
+  margin-bottom: 4px;
+  width: 100%;
+}
+
+.block-sticker--quote .sticker-quote__text-input {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  font-style: italic;
+  line-height: var(--leading-snug);
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  width: 100%;
+  resize: none;
+}
+
+/* Music player sticker */
+.block-sticker--player {
+  gap: var(--space-2);
+}
+.sticker-player__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sticker-player__meta {
+  display: flex;
+  flex-direction: column;
+}
+.sticker-player__title-text {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+}
+.sticker-player__artist-text {
+  font-size: 10px;
+  opacity: 0.7;
+}
+.sticker-player__progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.sticker-player__progress-fill {
+  height: 100%;
+  background: currentColor;
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+.sticker-player__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.sticker-player__btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--dur-fast), transform var(--dur-fast);
+}
+.sticker-player__btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: scale(1.1);
+}
+.sticker-player__btn--play {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================
+   CARD ENTRY ANIMATION
+   ============================================ */
+@keyframes blockEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.bento-card.entering {
+  animation: blockEnter var(--dur-slow) var(--ease-decel) forwards;
+}
+
+/* ============================================
+   SHELVES WIDGET (Livros & Filmes com capas)
+   ============================================ */
+.shelves-widget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2);
+}
+
+.shelves-tabs {
+  display: flex;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-outline-soft);
+  padding-bottom: var(--space-2);
+}
+
+.shelves-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  color: var(--color-text-3);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--dur-fast);
+}
+
+.shelves-tab:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-1);
+}
+
+.shelves-tab.active {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.shelves-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.shelf-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-outline-soft);
+  transition: background var(--dur-fast), border-color var(--dur-fast);
+}
+
+.shelf-card:hover {
+  border-color: var(--color-primary-soft);
+}
+
+/* Cover Slot / Placeholder */
+.shelf-cover-wrap {
+  width: 52px;
+  height: 72px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+  background: var(--color-surface);
+  border: 1.5px dashed var(--color-outline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--dur-fast), transform var(--dur-fast);
+}
+
+.shelf-cover-wrap:hover {
+  border-color: var(--color-primary);
+  transform: scale(1.04);
+}
+
+.shelf-cover-input {
+  display: none;
+}
+
+.shelf-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.shelf-cover-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--color-text-4);
+  padding: 4px;
+  text-align: center;
+}
+
+.shelf-placeholder-icon {
+  opacity: 0.7;
+}
+
+.shelf-placeholder-label {
+  font-size: 8px;
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.shelf-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.shelf-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--color-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shelf-sub {
+  font-size: var(--text-xs);
+  color: var(--color-text-3);
+  margin-top: 1px;
+}
+
+.shelf-meta {
+  font-size: 10px;
+  color: var(--color-text-4);
+  margin-top: 3px;
+}
+
+.shelf-add-btn,
+.habit-add-btn,
+.link-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--color-outline);
+  background: transparent;
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all var(--dur-fast);
+  margin-top: var(--space-1);
+}
+
+.shelf-add-btn:hover,
+.habit-add-btn:hover,
+.link-add-btn:hover {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+}
+
+/* ============================================
+   HABITS WIDGET
+   ============================================ */
+.habits-widget {
+  padding: var(--space-2) var(--space-2);
+}
+
+/* ============================================
+   LINKS WIDGET
+   ============================================ */
+.links-widget {
+  padding: var(--space-2) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.links-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.link-card-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-outline-soft);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--dur-fast);
+}
+
+.link-card-chip:hover {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary-soft);
+}
+
+.link-card-chip__emoji {
+  font-size: 16px;
+}
+
+.link-card-chip__texts {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.link-card-chip__title {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  color: var(--color-text-1);
+}
+
+.link-card-chip__url {
+  font-size: 10px;
+  color: var(--color-text-4);
+}
+
+.link-card-chip__arrow {
+  color: var(--color-text-4);
+  opacity: 0;
+  transition: opacity var(--dur-fast);
+}
+
+.link-card-chip:hover .link-card-chip__arrow {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+/* ============================================
+   MOOD WIDGET
+   ============================================ */
+.mood-widget {
+  padding: var(--space-2) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mood-widget__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mood-widget__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mood-widget__current {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  color: var(--color-primary);
+}
+
+.mood-widget__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.mood-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-outline-soft);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: all var(--dur-fast);
+  font-size: 11px;
+}
+
+.mood-chip:hover {
+  background: var(--color-surface-2);
+}
+
+.mood-chip.active {
+  border-color: var(--color-primary);
+  font-weight: var(--weight-semi);
+  color: var(--color-primary);
+}
+
+.mood-widget__note-input {
+  font-size: var(--text-xs);
+  color: var(--color-text-2);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-outline-soft);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  outline: none;
+  width: 100%;
+  margin-top: 4px;
+  transition: border-color var(--dur-fast);
+}
+
+.mood-widget__note-input:focus {
+  border-color: var(--color-primary);
+}
