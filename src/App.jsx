@@ -435,41 +435,9 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Date Navigator */}
-                <div className="diary-date-nav">
-                  <button
-                    className="diary-date-nav__btn"
-                    onClick={goToPrevDay}
-                    title="Dia anterior"
-                    id="btn-prev-day"
-                  >
-                    <ChevronLeft size={18} />
-                  </button>
-
-                  <div className="diary-header__date">
-                    {weekday.charAt(0).toUpperCase() + weekday.slice(1)},{' '}
-                    <em>{dayNum} de {month}</em>{' '}de {year}
-                  </div>
-
-                  <button
-                    className="diary-date-nav__btn"
-                    onClick={goToNextDay}
-                    title="Próximo dia"
-                    id="btn-next-day"
-                  >
-                    <ChevronRight size={18} />
-                  </button>
-
-                  {!isToday && (
-                    <button
-                      className="diary-date-nav__today-btn"
-                      onClick={goToToday}
-                      title="Voltar para a página de hoje"
-                      id="btn-go-today"
-                    >
-                      Ir para Hoje
-                    </button>
-                  )}
+                <div className="diary-header__date">
+                  {weekday.charAt(0).toUpperCase() + weekday.slice(1)},{' '}
+                  <em>{dayNum} de {month}</em>{' '}de {year}
                 </div>
 
                 <div className="diary-header__meta">
@@ -483,6 +451,40 @@ export default function App() {
                     Entradas salvas automaticamente no LocalStorage 💾
                   </span>
                 </div>
+              </div>
+
+              {/* === ETIQUETAS LATERAIS DE NAVEGAÇÃO (LADO DIREITO) === */}
+              <div className="diary-page-tabs" aria-label="Navegação entre dias">
+                <button
+                  className="diary-page-tab"
+                  onClick={goToPrevDay}
+                  title="Dia anterior"
+                  id="tab-prev-day"
+                >
+                  <ChevronLeft size={16} />
+                  <span className="diary-page-tab__label">ANTERIOR</span>
+                </button>
+
+                <button
+                  className="diary-page-tab"
+                  onClick={goToNextDay}
+                  title="Próximo dia"
+                  id="tab-next-day"
+                >
+                  <ChevronRight size={16} />
+                  <span className="diary-page-tab__label">PRÓXIMO</span>
+                </button>
+
+                {!isToday && (
+                  <button
+                    className="diary-page-tab diary-page-tab--today"
+                    onClick={goToToday}
+                    title="Voltar para a página de hoje"
+                    id="tab-today"
+                  >
+                    <span className="diary-page-tab__label">HOJE</span>
+                  </button>
+                )}
               </div>
 
               {/* === FREE FLOATING STICKERS LAYER === */}
